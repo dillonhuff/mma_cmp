@@ -1,0 +1,5 @@
+Run:
+
+bash$ scrapy runspider sherdogspider.py
+
+In in the mma_scrape virtualenv
