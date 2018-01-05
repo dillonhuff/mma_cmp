@@ -36,3 +36,8 @@ for line in proc_lines:
 print 'Jon Jones beat ', lg.fighter_wins("/fighter/Jon-Jones-27944")
 print 'Jon Jones lost to ', lg.fighter_losses("/fighter/Jon-Jones-27944")
 
+for fighter in lg.getFighters():
+
+    if len(lg.fighter_losses(fighter)) == 0:
+        print fighter, 'is undefeated with', len(lg.fighter_wins(fighter)), 'wins'
+
