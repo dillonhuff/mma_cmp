@@ -53,6 +53,9 @@ class Date:
     def month_num(self):
         return month_to_num(self.month)
 
+    def to_string(self):
+        return self.month + '-' + str(self.day) + '-' + str(self.year)
+
 class Fight:
     def __init__(self, f0, f1, result, date):
         self.f0 = f0
@@ -125,9 +128,10 @@ def fight_date_cmp(a, b):
     return date_cmp(ad, bd)
 
 fights.sort(fight_date_cmp)
+fights = reversed(fights)
 
-for fight in fights:
-    print fight.f0, fight.f1, fight.result, ', ', fight.date.month, '/', fight.date.day, '/', fight.date.year
+# for fight in fights:
+#     print fight.f0, fight.f1, fight.result, ', ', fight.date.month, '/', fight.date.day, '/', fight.date.year
 
 # lg = LossGraph()
 
@@ -150,9 +154,23 @@ for fight in fights:
 #     if len(lg.fighter_losses(fighter)) == 0:
 #         print fighter, 'is undefeated with', len(lg.fighter_wins(fighter)), 'wins'
 
-x = Real('x')
-y = Real('y')
+print 'Setting up optimization problem'
 s = Solver()
-s.add(x + y > 5, x > 1, y > 1)
+
+for fight in fights:
+    if (fight.result == 'win') or (fight.result == 'loss'):
+        f0_dt = fight.f0 + '-' + fight.date.to_string()
+        f1_dt = fight.f1 + '-' + fight.date.to_string()
+
+        f0v = Real(f0_dt)
+        f1v = Real(f1_dt)
+
+        if (fight.result == 'win'):
+            s.add(f0v > f1v)
+        else:
+            s.add(f1v > f0v)
+
+print 'Checking model...'
 print(s.check())
+
 print(s.model())
