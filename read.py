@@ -23,11 +23,35 @@ for line in lines:
 
     proc_lines.append(tokens)
 
+def is_month(s):
+    months = Set(['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'])
+
+    return s in months
+
+def month_to_num(s):
+    month_nums = {'Jan' : 0,
+                  'Feb' : 1,
+                  'Mar' : 2,
+                  'Apr' : 3,
+                  'May' : 4,
+                  'Jun' : 5,
+                  'Jul' : 6,
+                  'Aug' : 7,
+                  'Sep' : 8,
+                  'Oct' : 9,
+                  'Nov' : 10,
+                  'Dec' : 11}
+
+    return month_nums[s]
+    
 class Date:
     def __init__(self, month, day, year):
         self.month = month
         self.day = day
         self.year = year
+
+    def month_num(self):
+        return month_to_num(self.month)
 
 class Fight:
     def __init__(self, f0, f1, result, date):
@@ -35,11 +59,6 @@ class Fight:
         self.f1 = f1
         self.result = result
         self.date = date
-
-def is_month(s):
-    months = Set(['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'])
-
-    return s in months
 
 def represents_int(s):
     try: 
@@ -76,6 +95,39 @@ for proc_line in proc_lines:
         fights.append(Fight(f1, f2, res, dt))
 
 print '# of fights = ', len(fights)
+
+print 'Sorting fights by date'
+
+def date_cmp(a, b):
+    if a.year > b.year:
+        return -1
+
+    if a.year < b.year:
+        return 1
+
+    # same year
+
+    if a.month_num() > b.month_num():
+        return -1
+
+    if a.month_num() < b.month_num():
+        return 1
+
+    # same month
+    if a.day > b.day:
+        return -1
+
+    return 1
+    
+def fight_date_cmp(a, b):
+    ad = a.date
+    bd = b.date
+    return date_cmp(ad, bd)
+
+fights.sort(fight_date_cmp)
+
+for fight in fights:
+    print fight.f0, fight.f1, fight.result, ', ', fight.date.month, '/', fight.date.day, '/', fight.date.year
 
 # lg = LossGraph()
 
