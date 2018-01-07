@@ -23,3 +23,29 @@ class Fight:
         self.cause = cause
         self.date = date
 
+def date_cmp(a, b):
+    if a.year > b.year:
+        return -1
+
+    if a.year < b.year:
+        return 1
+
+    # same year
+
+    if a.month_num() > b.month_num():
+        return -1
+
+    if a.month_num() < b.month_num():
+        return 1
+
+    # same month
+    if a.day > b.day:
+        return -1
+
+    return 1
+    
+def fight_date_cmp(a, b):
+    ad = a.date
+    bd = b.date
+    return date_cmp(ad, bd)
+

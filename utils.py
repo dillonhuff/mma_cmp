@@ -1,3 +1,5 @@
+from sets import Set
+
 def represents_int(s):
     try: 
         int(s)

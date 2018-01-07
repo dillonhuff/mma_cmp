@@ -1,87 +1,61 @@
 from loss_graph import LossGraph
-from sets import Set
 from eigen_rank import *
 from fight import *
 from utils import *
 
+def load_fights(f):
+    lines = []
+    for line in f.read().splitlines():
+        lines.append(line)
+
+    print '# of lines = ', len(lines)
+
+    proc_lines = []
+
+    for line in lines:
+        tokens = []
+
+        for tok in line.split(' '):
+            for tk in tok.split('\t'):
+                tokens.append(tk)
+
+        proc_lines.append(tokens)
+
+    fights = []
+    for proc_line in proc_lines:
+        f1 = proc_line[0]
+        f2 = proc_line[1]
+        res = proc_line[2]
+        cause = proc_line[3]
+
+        i = 4
+        while not is_month(proc_line[i]):
+            i += 1
+
+        assert(is_month(proc_line[i]))
+
+        month = proc_line[i]
+
+        assert(proc_line[i + 1] == '/')
+
+        day = proc_line[i + 2]
+
+        assert(proc_line[i + 3] == '/')
+
+        year = proc_line[i + 4]
+
+        if represents_int(year) and represents_int(day):
+            dt = Date(month, int(day), int(year))
+
+            fights.append(Fight(f1, f2, res, cause, dt))
+
+    return fights
+
 f = open('./data/fights_2018-01-06.csv', 'r')
 
-lines = []
-for line in f.read().splitlines():
-    lines.append(line)
-
-#lines = lines[0:50000]
-
-print '# of lines = ', len(lines)
-
-proc_lines = []
-
-for line in lines:
-    tokens = []
-
-    for tok in line.split(' '):
-        for tk in tok.split('\t'):
-            tokens.append(tk)
-
-    proc_lines.append(tokens)
-
-fights = []
-for proc_line in proc_lines:
-    f1 = proc_line[0]
-    f2 = proc_line[1]
-    res = proc_line[2]
-    cause = proc_line[3]
-
-    i = 4
-    while not is_month(proc_line[i]):
-        i += 1
-
-    assert(is_month(proc_line[i]))
-
-    month = proc_line[i]
-
-    assert(proc_line[i + 1] == '/')
-
-    day = proc_line[i + 2]
-
-    assert(proc_line[i + 3] == '/')
-
-    year = proc_line[i + 4]
-
-    if represents_int(year) and represents_int(day):
-        dt = Date(month, int(day), int(year))
-
-        fights.append(Fight(f1, f2, res, cause, dt))
+fights = load_fights(f)
 
 print '# of fights = ', len(fights)
-
-print 'Sorting fights by date'
-
-def date_cmp(a, b):
-    if a.year > b.year:
-        return -1
-
-    if a.year < b.year:
-        return 1
-
-    # same year
-
-    if a.month_num() > b.month_num():
-        return -1
-
-    if a.month_num() < b.month_num():
-        return 1
-
-    # same month
-    if a.day > b.day:
-        return -1
-
-    return 1
-    
-def fight_date_cmp(a, b):
-    ad = a.date
-    bd = b.date
-    return date_cmp(ad, bd)
 
 # fights.sort(fight_date_cmp)
 # fights = list(reversed(fights))
