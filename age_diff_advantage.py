@@ -4,6 +4,7 @@ from utils import *
 from load_fights import *
 from load_fighters import *
 from pprint import pprint
+import matplotlib.pyplot as plt
 
 fighters_file = open('./data/fighter_file_2018-01-06.csv', 'r')
 fighters = load_fighters(fighters_file)
@@ -40,9 +41,13 @@ def get_younger_fighter(fight, fighters):
 
     return f1
 
-age_diff_records = {}
-for i in range(-100, 100):
-    age_diff_records[i] = {'win' : 0, 'loss' : 0}
+# age_diff_records = {}
+# for i in range(-100, 100):
+#     age_diff_records[i] = {'win' : 0, 'loss' : 0}
+
+abs_diff_younger_wins = {}
+for i in range(0, 70):
+    abs_diff_younger_wins[i] = {'total_fights' : 0, 'younger_wins' : 0}
 
 for fight in fights:
     if ((fight.result == 'win') or (fight.result == 'loss')) and (not (fight.cause == 'DQ')):
@@ -50,24 +55,42 @@ for fight in fights:
         f1 = fight.f1
 
         if has_dob(f0, fighters) and has_dob(f1, fighters):
-            num_fights += 1
             # 1995 - 1985 = 10, positive means f0 is YOUNGER!
             diff = fighters[f0].year - fighters[f1].year
 
             # If the fighters are not the same age
             if diff != 0:
+                abs_diff = abs(diff)
+                num_fights += 1
                 winner = get_winner(fight)
                 younger = get_younger_fighter(fight, fighters)
+                abs_diff_younger_wins[abs_diff]['total_fights'] = abs_diff_younger_wins[abs_diff]['total_fights'] + 1
+
                 if winner == younger:
                     num_younger_wins += 1
+                    abs_diff_younger_wins[abs_diff]['younger_wins'] = abs_diff_younger_wins[abs_diff]['younger_wins'] + 1
+                    
             
-            if fight.result == 'win':
-                age_diff_records[diff]['win'] = age_diff_records[diff]['win'] + 1
-            else:
-                age_diff_records[diff]['loss'] = age_diff_records[diff]['loss'] + 1
-
-pprint(age_diff_records)                
+pprint(abs_diff_younger_wins)       
 
 print '# of fights =', num_fights
 print '# of fights won by younger fighter =', num_younger_wins
 print '% of fights won by younger fighter =', (num_younger_wins / float(num_fights))*100.0
+
+age_diffs = []
+win_pcts = []
+print 'Younger win ratios by age'
+for i in xrange(1, 25):
+    if abs_diff_younger_wins[i]['total_fights'] != 0:
+        young_win_pct = (abs_diff_younger_wins[i]['younger_wins'] / float(abs_diff_younger_wins[i]['total_fights'])) * 100.0
+        win_pcts.append(young_win_pct)
+        age_diffs.append(i)
+
+        print 'Diff = ', i, ', Younger win percentage =', young_win_pct
+    else:
+        print 'Diff = ', i, 'Younger win percentage UNDEFINED'
+    
+
+plt.scatter(age_diffs, win_pcts)
+plt.plot(age_diffs, win_pcts)
+plt.show()
