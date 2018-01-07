@@ -64,21 +64,24 @@ def get_redirects(redirects_filename):
 
 def build_fighter_index(fights):
     ind = {}
+    ind_to_fight = {}
     next_index = 0
     for fight in fights:
         if not (fight.f0 in ind):
             ind[fight.f0] = next_index
+            ind_to_fight[next_index] = fight.f0
             next_index += 1
 
         if not (fight.f1 in ind):
             ind[fight.f1] = next_index
+            ind_to_fight[next_index] = fight.f1
             next_index += 1
 
-    return ind
+    return ind, ind_to_fight
 
 #def get_adjacency_matrix(redirects_filename, page_links_filename, limit=None):
 def get_adjacency_matrix(fights):
-    fighter_indexes = build_fighter_index(fights)
+    fighter_indexes, inds_to_fighters = build_fighter_index(fights)
 
     X = sparse.lil_matrix((len(fighter_indexes), len(fighter_indexes)),
                           dtype=np.float32)
@@ -88,11 +91,14 @@ def get_adjacency_matrix(fights):
             f1_ind = fighter_indexes[fight.f1]
 
             if fight.result == 'win':
-                X[f0_ind, f1_ind] = 1.0
-            else:
                 X[f1_ind, f0_ind] = 1.0
+            else:
+                X[f0_ind, f1_ind] = 1.0
 
-    return X, fighter_indexes
+    print("Converting to CSR representation")
+    X = X.tocsr()
+                
+    return X, fighter_indexes, inds_to_fighters
 
 #     """Extract the adjacency graph as a scipy sparse matrix
 
@@ -151,42 +157,42 @@ def get_adjacency_matrix(fights):
 # # pprint([names[i] for i in np.abs(V[0]).argsort()[-10:]])
 
 
-# def centrality_scores(X, alpha=0.85, max_iter=100, tol=1e-10):
-#     """Power iteration computation of the principal eigenvector
+def centrality_scores(X, alpha=0.85, max_iter=100, tol=1e-10):
+    """Power iteration computation of the principal eigenvector
 
-#     This method is also known as Google PageRank and the implementation
-#     is based on the one from the NetworkX project (BSD licensed too)
-#     with copyrights by:
+    This method is also known as Google PageRank and the implementation
+    is based on the one from the NetworkX project (BSD licensed too)
+    with copyrights by:
 
-#       Aric Hagberg <hagberg@lanl.gov>
-#       Dan Schult <dschult@colgate.edu>
-#       Pieter Swart <swart@lanl.gov>
-#     """
-#     n = X.shape[0]
-#     X = X.copy()
-#     incoming_counts = np.asarray(X.sum(axis=1)).ravel()
+      Aric Hagberg <hagberg@lanl.gov>
+      Dan Schult <dschult@colgate.edu>
+      Pieter Swart <swart@lanl.gov>
+    """
+    n = X.shape[0]
+    X = X.copy()
+    incoming_counts = np.asarray(X.sum(axis=1)).ravel()
 
-#     print("Normalizing the graph")
-#     for i in incoming_counts.nonzero()[0]:
-#         X.data[X.indptr[i]:X.indptr[i + 1]] *= 1.0 / incoming_counts[i]
-#     dangle = np.asarray(np.where(X.sum(axis=1) == 0, 1.0 / n, 0)).ravel()
+    print("Normalizing the graph")
+    for i in incoming_counts.nonzero()[0]:
+        X.data[X.indptr[i]:X.indptr[i + 1]] *= 1.0 / incoming_counts[i]
+    dangle = np.asarray(np.where(X.sum(axis=1) == 0, 1.0 / n, 0)).ravel()
 
-#     scores = np.ones(n, dtype=np.float32) / n  # initial guess
-#     for i in range(max_iter):
-#         print("power iteration #%d" % i)
-#         prev_scores = scores
-#         scores = (alpha * (scores * X + np.dot(dangle, prev_scores))
-#                   + (1 - alpha) * prev_scores.sum() / n)
-#         # check convergence: normalized l_inf norm
-#         scores_max = np.abs(scores).max()
-#         if scores_max == 0.0:
-#             scores_max = 1.0
-#         err = np.abs(scores - prev_scores).max() / scores_max
-#         print("error: %0.6f" % err)
-#         if err < n * tol:
-#             return scores
+    scores = np.ones(n, dtype=np.float32) / n  # initial guess
+    for i in range(max_iter):
+        print("power iteration #%d" % i)
+        prev_scores = scores
+        scores = (alpha * (scores * X + np.dot(dangle, prev_scores))
+                  + (1 - alpha) * prev_scores.sum() / n)
+        # check convergence: normalized l_inf norm
+        scores_max = np.abs(scores).max()
+        if scores_max == 0.0:
+            scores_max = 1.0
+        err = np.abs(scores - prev_scores).max() / scores_max
+        print("error: %0.6f" % err)
+        if err < n * tol:
+            return scores
 
-#     return scores
+    return scores
 
 # # print("Computing principal eigenvector score using a power iteration method")
 # # t0 = time()

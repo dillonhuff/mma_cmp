@@ -8,7 +8,7 @@ lines = []
 for line in f.read().splitlines():
     lines.append(line)
 
-lines = lines[0:10000]
+#lines = lines[0:50000]
 
 print '# of lines = ', len(lines)
 
@@ -132,6 +132,21 @@ fights = list(reversed(fights))
 
 print '# of fights in reversed list = ', len(fights)
 
-adj_matrix, inds = get_adjacency_matrix(fights)
+X, inds, names = get_adjacency_matrix(fights)
 
+# print("Computing the principal singular vectors using randomized_svd")
+# t0 = time()
+# U, s, V = randomized_svd(X, 5, n_iter=5)
+# print("done in %0.3fs" % (time() - t0))
 
+# # print the names of the wikipedia related strongest components of the
+# # principal singular vector which should be similar to the highest eigenvector
+# print("Top fighters according to principal singular vectors")
+# pprint([names[i] for i in np.abs(U.T[0]).argsort()[-10:]])
+# pprint([names[i] for i in np.abs(V[0]).argsort()[-10:]])
+
+print("Computing principal eigenvector score using a power iteration method")
+t0 = time()
+scores = centrality_scores(X, max_iter=100, tol=1e-10)
+print("done in %0.3fs" % (time() - t0))
+pprint([names[i] for i in np.abs(scores).argsort()[-10:]])
