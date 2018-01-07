@@ -1,13 +1,15 @@
 from loss_graph import LossGraph
 from sets import Set
-from z3 import *
+from eigen_rank import *
 
 f = open('./data/fights_2018-01-04.csv', 'r')
 
 lines = []
 for line in f.read().splitlines():
     lines.append(line)
-    
+
+lines = lines[0:10000]
+
 print '# of lines = ', len(lines)
 
 proc_lines = []
@@ -128,24 +130,8 @@ def fight_date_cmp(a, b):
 fights.sort(fight_date_cmp)
 fights = list(reversed(fights))
 
-print 'Setting up optimization problem'
-s = Solver()
+print '# of fights in reversed list = ', len(fights)
 
-fights = fights[0:3000]
-for fight in fights:
-    if (fight.result == 'win') or (fight.result == 'loss'):
-        f0_dt = fight.f0 + '-' + fight.date.to_string()
-        f1_dt = fight.f1 + '-' + fight.date.to_string()
+adj_matrix, inds = get_adjacency_matrix(fights)
 
-        f0v = Real(f0_dt)
-        f1v = Real(f1_dt)
 
-        if (fight.result == 'win'):
-            s.add(f0v > f1v)
-        else:
-            s.add(f1v > f0v)
-
-print 'Checking model...'
-print(s.check())
-
-print(s.model())
