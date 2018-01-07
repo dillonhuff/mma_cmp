@@ -2,9 +2,7 @@ from loss_graph import LossGraph
 from sets import Set
 from z3 import *
 
-f = open('./fights_2018-01-04.csv', 'r')
-
-
+f = open('./data/fights_2018-01-04.csv', 'r')
 
 lines = []
 for line in f.read().splitlines():
