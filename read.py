@@ -1,9 +1,10 @@
 from loss_graph import LossGraph
 from sets import Set
 from eigen_rank import *
+from fight import *
 
 #f = open('./data/fights_2018-01-04.csv', 'r')
-f = open('./fights_2018-01-06.csv', 'r')
+f = open('./data/fights_2018-01-06.csv', 'r')
 
 lines = []
 for line in f.read().splitlines():
@@ -45,26 +46,6 @@ def month_to_num(s):
 
     return month_nums[s]
     
-class Date:
-    def __init__(self, month, day, year):
-        self.month = month
-        self.day = day
-        self.year = year
-
-    def month_num(self):
-        return month_to_num(self.month)
-
-    def to_string(self):
-        return self.month + '-' + str(self.day) + '-' + str(self.year)
-
-class Fight:
-    def __init__(self, f0, f1, result, cause, date):
-        self.f0 = f0
-        self.f1 = f1
-        self.result = result
-        self.cause = cause
-        self.date = date
-
 def represents_int(s):
     try: 
         int(s)
