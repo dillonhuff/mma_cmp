@@ -2,8 +2,8 @@ from loss_graph import LossGraph
 from sets import Set
 from eigen_rank import *
 from fight import *
+from utils import *
 
-#f = open('./data/fights_2018-01-04.csv', 'r')
 f = open('./data/fights_2018-01-06.csv', 'r')
 
 lines = []
@@ -24,34 +24,6 @@ for line in lines:
             tokens.append(tk)
 
     proc_lines.append(tokens)
-
-def is_month(s):
-    months = Set(['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'])
-
-    return s in months
-
-def month_to_num(s):
-    month_nums = {'Jan' : 0,
-                  'Feb' : 1,
-                  'Mar' : 2,
-                  'Apr' : 3,
-                  'May' : 4,
-                  'Jun' : 5,
-                  'Jul' : 6,
-                  'Aug' : 7,
-                  'Sep' : 8,
-                  'Oct' : 9,
-                  'Nov' : 10,
-                  'Dec' : 11}
-
-    return month_nums[s]
-    
-def represents_int(s):
-    try: 
-        int(s)
-        return True
-    except ValueError:
-        return False
 
 fights = []
 for proc_line in proc_lines:
