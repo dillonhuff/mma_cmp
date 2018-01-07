@@ -2,7 +2,8 @@ from loss_graph import LossGraph
 from sets import Set
 from eigen_rank import *
 
-f = open('./data/fights_2018-01-04.csv', 'r')
+#f = open('./data/fights_2018-01-04.csv', 'r')
+f = open('./fights_2018-01-06.csv', 'r')
 
 lines = []
 for line in f.read().splitlines():
@@ -129,10 +130,10 @@ def fight_date_cmp(a, b):
     bd = b.date
     return date_cmp(ad, bd)
 
-fights.sort(fight_date_cmp)
-fights = list(reversed(fights))
+# fights.sort(fight_date_cmp)
+# fights = list(reversed(fights))
 
-print '# of fights in reversed list = ', len(fights)
+#print '# of fights in reversed list = ', len(fights)
 
 X, inds, names = get_adjacency_matrix(fights)
 
@@ -151,4 +152,4 @@ print("Computing principal eigenvector score using a power iteration method")
 t0 = time()
 scores = centrality_scores(X, max_iter=100, tol=1e-10)
 print("done in %0.3fs" % (time() - t0))
-pprint([names[i] for i in np.abs(scores).argsort()[-10:]])
+pprint([names[i] for i in np.abs(scores).argsort()[-1000:]])
