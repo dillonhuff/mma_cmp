@@ -86,7 +86,7 @@ def get_adjacency_matrix(fights):
     X = sparse.lil_matrix((len(fighter_indexes), len(fighter_indexes)),
                           dtype=np.float32)
     for fight in fights:
-        if (fight.result == 'win') or (fight.result == 'loss'):
+        if ((fight.result == 'win') or (fight.result == 'loss')) and (not (fight.cause == 'DQ')):
             f0_ind = fighter_indexes[fight.f0]
             f1_ind = fighter_indexes[fight.f1]
 

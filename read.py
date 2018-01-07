@@ -57,10 +57,11 @@ class Date:
         return self.month + '-' + str(self.day) + '-' + str(self.year)
 
 class Fight:
-    def __init__(self, f0, f1, result, date):
+    def __init__(self, f0, f1, result, cause, date):
         self.f0 = f0
         self.f1 = f1
         self.result = result
+        self.cause = cause
         self.date = date
 
 def represents_int(s):
@@ -75,8 +76,9 @@ for proc_line in proc_lines:
     f1 = proc_line[0]
     f2 = proc_line[1]
     res = proc_line[2]
+    cause = proc_line[3]
 
-    i = 3
+    i = 4
     while not is_month(proc_line[i]):
         i += 1
 
@@ -95,7 +97,7 @@ for proc_line in proc_lines:
     if represents_int(year) and represents_int(day):
         dt = Date(month, int(day), int(year))
 
-        fights.append(Fight(f1, f2, res, dt))
+        fights.append(Fight(f1, f2, res, cause, dt))
 
 print '# of fights = ', len(fights)
 
