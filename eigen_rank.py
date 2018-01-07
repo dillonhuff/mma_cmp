@@ -79,7 +79,6 @@ def build_fighter_index(fights):
 
     return ind, ind_to_fight
 
-#def get_adjacency_matrix(redirects_filename, page_links_filename, limit=None):
 def get_adjacency_matrix(fights):
     fighter_indexes, inds_to_fighters = build_fighter_index(fights)
 
