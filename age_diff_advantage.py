@@ -41,9 +41,10 @@ def get_younger_fighter(fight, fighters):
 
     return f1
 
-# age_diff_records = {}
-# for i in range(-100, 100):
-#     age_diff_records[i] = {'win' : 0, 'loss' : 0}
+age_pair_wins = {}
+for i in range(0, 70):
+    for j in range(i + 1, 100):
+        age_pair_wins[(i, j)] = {'total_fights' : 0, 'younger_wins' : 0}
 
 abs_diff_younger_wins = {}
 for i in range(0, 70):
@@ -64,14 +65,42 @@ for fight in fights:
                 num_fights += 1
                 winner = get_winner(fight)
                 younger = get_younger_fighter(fight, fighters)
+
+                older = f1 if younger == f0 else f0
+
                 abs_diff_younger_wins[abs_diff]['total_fights'] = abs_diff_younger_wins[abs_diff]['total_fights'] + 1
 
+                fight_year = fight.date.year
+                younger_age = fight_year - fighters[younger].year
+                older_age = fight_year - fighters[older].year
+
+                if not (younger_age > 0) or not (older_age > 0):
+                    print 'Skipping malformed record'
+                    print 'Fighter = ', younger
+                    print 'Date of birth =', fighters[younger].to_string()
+                    print 'Opponent =', older
+                    print 'Date of birth =', fighters[older].to_string()
+                    print 'Date of fight =', fight.date.to_string()
+                    print 'younger_age = ', younger_age
+                    continue
+
+                assert(younger_age > 0)
+
+                assert(older_age > 0)
+
+                age_pair_wins[(younger_age, older_age)]['total_fights'] = age_pair_wins[(younger_age, older_age)]['total_fights'] + 1
+                
                 if winner == younger:
                     num_younger_wins += 1
                     abs_diff_younger_wins[abs_diff]['younger_wins'] = abs_diff_younger_wins[abs_diff]['younger_wins'] + 1
+                    age_pair_wins[(younger_age, older_age)]['younger_wins'] = age_pair_wins[(younger_age, older_age)]['younger_wins'] + 1
                     
-            
-pprint(abs_diff_younger_wins)       
+
+print 'Abs diff wins'
+pprint(abs_diff_younger_wins)
+
+print 'Age pair wins'
+pprint(age_pair_wins)
 
 print '# of fights =', num_fights
 print '# of fights won by younger fighter =', num_younger_wins
