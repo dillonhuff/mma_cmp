@@ -48,3 +48,11 @@ def fight_date_cmp(a, b):
     ad = a.date
     bd = b.date
     return date_cmp(ad, bd)
+
+def get_winner(fight):
+    assert((fight.result == 'win') or (fight.result == 'loss'))
+
+    if fight.result == 'win':
+        return fight.f0
+
+    return fight.f1
