@@ -99,6 +99,15 @@ for fight in fights:
 print 'Abs diff wins'
 pprint(abs_diff_younger_wins)
 
+deleted = True
+while deleted:
+    deleted = False
+    for key in age_pair_wins:
+        if age_pair_wins[key]['total_fights'] < 1:
+            del age_pair_wins[key]
+            deleted = True
+            break
+
 print 'Age pair wins'
 pprint(age_pair_wins)
 
