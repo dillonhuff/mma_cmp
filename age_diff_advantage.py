@@ -41,6 +41,10 @@ def get_younger_fighter(fight, fighters):
 
     return f1
 
+age_wins = {}
+for i in range(0, 100):
+    age_wins[i] = {'total_fights' : 0, 'wins' : 0}
+
 age_pair_wins = {}
 for i in range(0, 70):
     for j in range(i + 1, 100):
@@ -67,12 +71,14 @@ for fight in fights:
                 younger = get_younger_fighter(fight, fighters)
 
                 older = f1 if younger == f0 else f0
-
-                abs_diff_younger_wins[abs_diff]['total_fights'] = abs_diff_younger_wins[abs_diff]['total_fights'] + 1
+                loser = f1 if winner == f0 else f0
 
                 fight_year = fight.date.year
                 younger_age = fight_year - fighters[younger].year
                 older_age = fight_year - fighters[older].year
+
+                winner_age = fight_year - fighters[winner].year
+                loser_age = fight_year - fighters[loser].year
 
                 if not (younger_age > 0) or not (older_age > 0):
                     print 'Skipping malformed record'
@@ -87,6 +93,12 @@ for fight in fights:
                 assert(younger_age > 0)
 
                 assert(older_age > 0)
+
+                age_wins[winner_age]['total_fights'] = age_wins[winner_age]['total_fights'] + 1
+                age_wins[loser_age]['total_fights'] = age_wins[loser_age]['total_fights'] + 1
+                age_wins[winner_age]['wins'] = age_wins[winner_age]['wins'] + 1
+
+                abs_diff_younger_wins[abs_diff]['total_fights'] = abs_diff_younger_wins[abs_diff]['total_fights'] + 1
 
                 age_pair_wins[(younger_age, older_age)]['total_fights'] = age_pair_wins[(younger_age, older_age)]['total_fights'] + 1
                 
@@ -115,6 +127,22 @@ print '# of fights =', num_fights
 print '# of fights won by younger fighter =', num_younger_wins
 print '% of fights won by younger fighter =', (num_younger_wins / float(num_fights))*100.0
 
+ages = []
+age_win_pcts = []
+for i in xrange(17, 50):
+    if age_wins[i]['total_fights'] != 0:
+        win_pct = (age_wins[i]['wins'] / float(age_wins[i]['total_fights'])) * 100.0
+        ages.append(i)
+        age_win_pcts.append(win_pct)
+
+plt.scatter(ages, age_win_pcts)
+plt.title('The Youth Advantage')
+plt.xlabel('Age (years)')
+plt.ylabel('Win Percentage')
+plt.plot(ages, age_win_pcts)
+plt.show()
+
+
 age_diffs = []
 win_pcts = []
 print 'Younger win ratios by age'
@@ -130,5 +158,8 @@ for i in xrange(1, 25):
     
 
 plt.scatter(age_diffs, win_pcts)
+plt.title('The Youth Advantage')
+plt.xlabel('Absolute Fighter Age Difference (years)')
+plt.ylabel('Younger Fighter Win Percentage')
 plt.plot(age_diffs, win_pcts)
 plt.show()
